@@ -1,3 +1,4 @@
+*.hexcel
 dist
 dist-*
 cabal-dev
