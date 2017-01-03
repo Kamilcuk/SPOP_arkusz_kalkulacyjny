@@ -3,23 +3,12 @@ import System.Exit
 import System.Directory
 import Data.List
 import Text.Printf
-import EdycjaArkusza
-import Data.CSV
-import Text.ParserCombinators.Parsec
 
 
 version :: Float
 version = 0.1
 
-csvParsing 
-
 main = do
-  let result = parse csvFile "(unknown)" "row1,row2\nline2row1,line2row2\nline3row1,\n"
-  :info result
-  print result
-  exitSuccess
-
-
   putStrLn "Welcome to Hexcel!"
   printf   "Wersja: %.2f\n" version
   putStrLn "Hexcel jest to uniwersalne rozwiązanie potrzebne w każdym domu!"
@@ -53,8 +42,9 @@ menu = do
       putStrLn "Nazwa arkusza:"
       temp <- getLine
       let name = temp ++ ".hexcel"
-      -- edycja arkusza
-      edycjaArkusza name
+      -- otwarcie edycja arkusza
+      let arkusz = "" -- tutaj bedzie funkcja do otwierania arkusza
+      edycjaArkuszaMenu name
       return 0
     'u' -> do
       putStrLn "> Usuwanie arkusza"
@@ -81,3 +71,35 @@ menu = do
   else
     return 0
 
+edycjaArkuszaMenu :: [Char] -> IO Int
+edycjaArkuszaMenu nazwa arkusz = do
+  putStrLn ""
+  putStrLn ("> menu arkusza " ++ nazwa)
+  putStrLn "Wybierz jedną z poniższych opcji:"
+  putStrLn "w - wypisz arkusz na ekran"
+  putStrLn "e - edytuj dane w podanej komórce"
+  putStrLn "s - zapisz arkusz na dysk"
+  putStrLn "x - wróć do menu głównego"
+  a <- getLine
+  let w = if length a > 0 then (a !! 0) else ' '
+  case w of
+    'w' -> do
+      return 0
+    'e' -> do
+      putStrLn "Wiersz: "
+      wiersz <- getLine
+      putStrLn "Kolumna: "
+      kolumna <- getLine
+      -- edytujKomorke arkusz wiersz kolumna
+      return 0
+    's' -> do
+      return 0
+    'x' -> do
+      return 0
+    _ -> do
+      putStrLn "Nieznana opcja"
+      return 0
+  if w /= 'x' then 
+    edycjaArkuszaMenu nazwa arkusz
+  else
+    return 0

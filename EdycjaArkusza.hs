@@ -1,116 +1,107 @@
 module EdycjaArkusza where
-import Data.CSV
-import System.IO
+import Prelude
+import Data.Foldable
+import Data.Sequence
 
---rows - length (a:as) - zakladajac ze pierwszy wiersz jest najdluzszy (albo wszystkie sa rowne)
---cols - length ( head (a:as))
-displayFile:: String -> [[Int]] -> IO()
-displayFile name (a:as)= do
-  putStrLn ("Name of the file: " ++ name)
-  putStrLn (printFstLine [x| x<-[0..length ( head (a:as)) ]] )
-  putStrLn (printRowLine [x | x<- [1..length (a:as)] ] (a:as))
+----------------------- convetion -------------------------
+{-
+  Wszystkie eksportowane funkcje zaczynają się od ea ( EditArkusz / EdytujArkusz )
+-}
+{- ---------------------- global help funcitons ---------------------------------- -}
 
+-- resizeX
+resizeX :: [a] -> Int -> [a] -> [a]
+resizeX _ 0 list = list
+resizeX item len [] = item ++ resizeX item (len-1) []
+resizeX item len (l:list)= [l] ++ resizeX item (len-1) list
 
-printFstLine :: [Int] -> String
-printFstLine [] = "0"
-printFstLine (x:xs) | length(xs) == 0 = show x
-                    | otherwise = (show x) ++ " " ++ printFstLine xs
+-- resizeXY - resize array in both dimensions
+resizeXY :: [a] -> (Int, Int) -> [[a]] -> [[a]]
+resizeXY e (x,y) list = map (resizeX e x) $ resizeX [e] y list
 
-printRowLine :: [Int] -> [[Int]] -> String
-printRowLine [] _ = "0"
-printRowLine _ [] = "0"
-printRowLine (x:xs) (a:as) | length xs == 0 && length as == 0  = show x ++ "|" ++ printFstLine a
-                           | otherwise =  (show x) ++ "|" ++ printFstLine a ++ "\n" ++ printRowLine xs as
+removeHead :: [a] -> [a]
+removeHead [] = error "Empty list!"
+removeHead (x:xs) = xs
 
-edytujKomorke wiersz kolumna = do
-  return 0
+{- ---------------------- global data declarations ---------------------------------- -}
 
-otwarcieArkusza nazwa = do
-  -- writeFile nazwa "[[\"1\", \"2\", \"3\"]]"
-  -- str <- csvFile ""  nazwa
-  return 0
+{- 
+zawartością komórki może być:
+o napis,
+o liczba,
+o funkcja sumowania – dodaje liczby w podanych komórkach/zakresach komórek,
+o funkcja iloczynu – mnoży liczby w podanych komórkach/zakresach komórek,
+o funkcja wartości średniej – zwraca średnią arytmetyczną liczb w podanych komórkach/zakresach komórek; 
 
-edycjaArkusza nazwa = do
-  putStrLn "Otwieranie arkusza..."
-  otwarcieArkusza nazwa
-  putStrLn ""
-  putStrLn ("> menu arkusza " ++ nazwa)
-  putStrLn "Wybierz jedną z poniższych opcji:"
-  putStrLn "w - wypisz arkusz na ekran"
-  putStrLn "e - edytuj dane w podanej komórce"
-  putStrLn "x - wróć do menu głównego"
-  a <- getLine
-  let w = if length a > 0 then (a !! 0) else ' '
-  case w of
-    'w' -> do
-      return 0
-    'e' -> do
-      putStrLn "Wiersz: "
-      wiersz <- getLine
-      putStrLn "Kolumna: "
-      kolumna <- getLine
-      edytujKomorke wiersz kolumna
-      return 0
-    'x' -> do
-      return 0
-    _ -> do
-      putStrLn "Nieznana opcja"
-      return 0
-  if w /= 'x' then 
-    edycjaArkusza nazwa
-  else
-    return 0
-  
-{-  e <- getLine
-  if e=='ac' then 
-     do addColumn
-  else if e=='ar' then
-     do addRow
-  else if e=='dc' then 
-     do delColumn
-  else if e=='dr' then
-     do delRow
-  else if e=='ed' then
-     do editData
-  else if e=='sum' then
-     do doSum
-  else if e=='mult' then
-     do doMult
-  else if e=='ave' then
-     do doAve
-  else
-     do putStrLn "Don't know that option"
-     edit
- 
-
-addColumn = do
-  putStrLn "How many columns would you like to add?"
-  num <- getLine
-
-addRow = do
-  putStrLn "How many rows would you like to add?"
-  num <- getLine
-
-delColumn = do
-  putStrLn "Which column would you like to delete?"
-  num <- getLine
-
-delRow = do
-  putStrLn "Which row would you like to delete?"
-  num <- getLine
-
-editData = do
-
-doSum = do
-
-doMult = do
-
-doAve = do
+typ komórki jest pierwszym znakiem w niej
 -}
 
+data Przedzial = Komorka (Int,Int) Przedzial | Zakres (Int,Int,Int,Int) Przedzial | Pusty
+  deriving (Show, Read, Eq)
+data Komorka = Napis String | Liczba Float | Suma Przedzial | Iloczyn Przedzial | Srednia Przedzial | Pusta
+  deriving (Show, Read, Eq)
+type Arkusz = [[Komorka]]
 
+{- w jaki sposob sie numeruje arkusz? a no taki:
 
+ -------------------------X
+| (0,0) | (1,0) | (2,0)
+|-----------------------
+| (0,1) | (1,1) | (2,1)
+|-----------------------
+| (0,2) | (1,2) | (2,2)
+|-----------------------
+|
+Y
+-}
 
+eaResize :: (Int, Int) -> Arkusz -> Arkusz
+eaResize = resizeXY [Pusta]
 
+-- | wstawia wartość w punkt x y w podanej podwojnej tablicy (csv)
+eaWstawWartosc :: Komorka -> (Int, Int) -> Arkusz  -> Arkusz 
+eaWstawWartosc str (x,y) csv = toList . update y ( toList . update x str $ fromList $ eaResize ( (x+1), (y+1) ) csv !! y ) $ fromList $ eaResize ( (x+1), (y+1) ) csv
 
+eaPobierzKomorke :: (Int, Int) -> Arkusz -> Komorka
+eaPobierzKomorke (x,y) csv = csv !! y !! x
+
+eaPobierzStringKomorki :: Komorka -> String
+eaPobierzStringKomorki (Napis x) = x
+
+eaPobierzLiczbeKomorki :: Komorka -> Float
+eaPobierzLiczbeKomorki (Liczba x) = x
+
+eaPobierzPrzedzialKomorki :: Komorka -> Przedzial
+eaPobierzPrzedzialKomorki (Suma x) = x
+eaPobierzPrzedzialKomorki (Iloczyn x) = x
+eaPobierzPrzedzialKomorki (Srednia x) = x
+
+eaPobierzLiczbe :: (Int, Int) -> Arkusz -> Float
+eaPobierzLiczbe (x,y) ark = eaPobierzLiczbeKomorki $ eaPobierzKomorke (x,y) ark
+
+eaIloscElementowDoWartosciPrzedzialu :: Przedzial -> Int
+eaIloscElementowDoWartosciPrzedzialu (Pusty) = 0
+eaIloscElementowDoWartosciPrzedzialu (Komorka _ p) = 1 + eaIloscElementowDoWartosciPrzedzialu p
+eaIloscElementowDoWartosciPrzedzialu (Zakres (a,b,c,d) p) = Prelude.length [ (x,y) | x <- [a..b], y <- [c..d] ] 
+
+-- (b -> a -> b) -> b -> t a -> b
+eaObliczWartoscPrzedzialu :: (Float -> Float -> Float) -> Float -> Przedzial -> Arkusz -> Float
+eaObliczWartoscPrzedzialu _ n Pusty _ = n
+eaObliczWartoscPrzedzialu op n (Komorka c p) ark = op (eaObliczWartosc c ark) (eaObliczWartoscPrzedzialu op n p ark)
+eaObliczWartoscPrzedzialu op n (Zakres (a,b,c,d) p) ark = 
+    foldl op n 
+    (
+    (map (flip eaObliczWartosc ark) [ (x,y) | x <- [a..b], y <- [c..d] ] ) ++
+    [ (eaObliczWartoscPrzedzialu op n p ark) ]
+    )
+
+eaObliczWartoscKomorki :: Komorka -> Arkusz -> Float
+eaObliczWartoscKomorki (Liczba x) _ = x
+eaObliczWartoscKomorki (Suma p) ark = eaObliczWartoscPrzedzialu (+) 0 p ark
+eaObliczWartoscKomorki (Iloczyn p) ark = eaObliczWartoscPrzedzialu (*) 1 p ark
+eaObliczWartoscKomorki (Srednia p) ark = (eaObliczWartoscPrzedzialu (+) 0 p ark) / fromIntegral (eaIloscElementowDoWartosciPrzedzialu p)
+eaObliczWartoscKomorki (Napis _) _ = error "eaObliczWartoscKomorki na napisie!"
+
+eaObliczWartosc :: (Int, Int) -> Arkusz -> Float
+eaObliczWartosc c ark = eaObliczWartoscKomorki ( eaPobierzKomorke c ark ) ark
 
