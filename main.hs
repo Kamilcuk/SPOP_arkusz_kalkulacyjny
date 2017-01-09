@@ -44,7 +44,7 @@ menu = do
       let name = temp ++ ".hexcel"
       -- otwarcie edycja arkusza
       let arkusz = "" -- tutaj bedzie funkcja do otwierania arkusza
-      edycjaArkuszaMenu name
+      edycjaArkuszaMenu arkusz name
       return 0
     'u' -> do
       putStrLn "> Usuwanie arkusza"
@@ -71,7 +71,6 @@ menu = do
   else
     return 0
 
-edycjaArkuszaMenu :: [Char] -> IO Int
 edycjaArkuszaMenu nazwa arkusz = do
   putStrLn ""
   putStrLn ("> menu arkusza " ++ nazwa)

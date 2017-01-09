@@ -1,7 +1,7 @@
 import EdycjaArkusza
 import EdycjaArkuszaInternal
 import System.IO
-import Data.Either.Utils
+import Data.Either
 import Debug.Trace
 
 test1 = do
