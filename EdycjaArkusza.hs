@@ -4,6 +4,8 @@ import EdycjaArkuszaDatatypes
 import Prelude
 import Data.List
 import Debug.Trace
+import System.IO
+
 
 ----------------------- convetion -------------------------
 {-
@@ -222,3 +224,16 @@ eaObliczWartosc w ark =
     eaObliczWartoscUnsafe w ark
   else
     error $ "Nieskonczona petla w " ++ show w ++ " - nie da sie obliczyc wartosci!"
+
+
+--------------------- zapis wczytaj z pliku ------------------
+
+eaArkuszDoPliku :: String -> Arkusz -> IO ()
+eaArkuszDoPliku nazwaPliku arkusz = writeFile nazwaPliku $ show arkusz
+
+eaArkuszZPliku :: String -> IO (Arkusz)
+eaArkuszZPliku nazwaPliku = do
+  filetxt <- readFile nazwaPliku
+  let arkusz = read filetxt :: Arkusz
+  return arkusz
+

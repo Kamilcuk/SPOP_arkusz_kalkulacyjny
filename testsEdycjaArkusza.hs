@@ -222,6 +222,14 @@ test7 = do
     then error "test7.3" else return 0
   print "STOP  test7"
 
+test8 = do
+  let arkusz = [[Liczba 1]]
+  let nazwaPliku = "test8.hexcel"
+  eaArkuszDoPliku nazwaPliku arkusz   -- jak zapisujemy, musimy byc wewnatrz do block
+  result <- eaArkuszZPliku nazwaPliku -- JAK WCZYTUJEMY TRZEBA ZROBIC '<-' wewnatrzn do block
+  print arkusz -- = [[Liczba 1]]
+  print result -- = [[Liczba 1]]
+
 main = do
   test1
   test25
@@ -231,3 +239,4 @@ main = do
   test5
   test6
   test7
+  test8
