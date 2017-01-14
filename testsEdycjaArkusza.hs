@@ -4,6 +4,10 @@ import System.IO
 import Data.Either
 import Debug.Trace
 
+myerror str = do
+  print $ show str
+  return 0
+
 test1 = do
   print "START test1 - read and show na zwyklych variablech"
   let output = [[Liczba 2],[Napis "abc"],[Liczba 1],[Suma (Komorka (0,1) (Komorka (0,2) Pusty)) ]]
@@ -15,9 +19,8 @@ test1 = do
   -- print output
   -- print resoutput
   if output /= resoutput || string /= resstring then
-    error "test1"
-  else
-    print "STOP test1"
+    myerror "test1" else return 0
+  print "STOP test1"
 
 test2 = do
   let output = [[Iloczyn Pusty],[Napis "abc"],[Liczba 1],[Suma (Komorka (0,1) (Komorka (0,2) Pusty)) ]]
@@ -28,9 +31,8 @@ test2 = do
   -- print output
   -- print result
   if output /= result then
-    error "test2"
-  else
-    print "STOP test2"
+    myerror "test2" else return 0
+  print "STOP test2"
 
 test25 = do
   print "START test25 - test minimalizacji wielkosći arkusza - prosta"
@@ -46,7 +48,7 @@ test25 = do
   -- print $ input
   -- print $ eaArkuszMinimalizuj input
   if eaArkuszMinimalizuj input /= output then
-    error "test8" else return 0
+    myerror "test8" else return 0
   print "STOP  test25"
 
 test3 = do
@@ -78,9 +80,9 @@ test3 = do
   --print resultbezminimin
 
   if outputbezminim /= resultbezminimin then
-    error "test3.1" else return 0
+    myerror "test3.1" else return 0
   if outputzminim /= resultzminmin then
-    error "test3.2" else return 0
+    myerror "test3.2" else return 0
   print "STOP test3"
 
 test4 = do
@@ -107,7 +109,7 @@ test4 = do
     eaObliczWartosc (1,2) input /= 6 ||
     eaObliczWartosc (1,3) input /= 1.5 
   then
-    error "test4"
+    myerror "test4"
   else
     return 0
   print "STOP  test4"
@@ -130,23 +132,23 @@ test5 = do
   -- print $ eaPobierzPrzedzial (1,1) input
   -- print $ flip eaPrzedzialDoZbiorWspol input $ eaPobierzPrzedzial (1,1) input
   if eaObliczWartosc (1,1) input /= 6 then
-    error $ eaWypiszKomorke (1,1) input
+    myerror $ eaWypiszKomorke (1,1) input
   else
     return 0
   if eaObliczWartosc (1,2) input /= 144 then
-    error $ eaWypiszKomorke (1,2) input
+    myerror $ eaWypiszKomorke (1,2) input
   else
     return 0
   if eaObliczWartosc (1,3) input /= 2.5 then
-    error $ eaWypiszKomorke (1,3) input
+    myerror $ eaWypiszKomorke (1,3) input
   else
     return 0
   if eaObliczWartosc (1,4) input /= 30.8 then
-    error $ eaWypiszKomorke (1,4) input
+    myerror $ eaWypiszKomorke (1,4) input
   else
     return 0
   if eaObliczWartosc (1,4) input /= eaObliczWartosc (1,5) input then
-    error $ eaWypiszKomorke (1,5) input
+    myerror $ eaWypiszKomorke (1,5) input
   else
     return 0
   print "STOP  test5"
@@ -171,13 +173,13 @@ test6 = do
   --print $ eaCzyNieskonczonaPetla (1,4) input
   --print $ eaCzyNieskonczonaPetla (1,5) input
   --print $ eaCzyNieskonczonaPetla (1,6) input
-  if eaCzyNieskonczonaPetla (1,0) input /= True then error $ eaWypiszKomorke (1,0) input else return 0
-  if eaCzyNieskonczonaPetla (1,1) input /= False then error $ eaWypiszKomorke (1,1) input else return 0
-  if eaCzyNieskonczonaPetla (1,2) input /= True then error $ eaWypiszKomorke (1,2) input else return 0
-  if eaCzyNieskonczonaPetla (1,3) input /= False then error $ eaWypiszKomorke (1,3) input else return 0
-  if eaCzyNieskonczonaPetla (1,4) input /= True then error $ eaWypiszKomorke (1,4) input else return 0
-  if eaCzyNieskonczonaPetla (1,5) input /= False then error $ eaWypiszKomorke (1,5) input else return 0
-  if eaCzyNieskonczonaPetla (1,6) input /= True then error $ eaWypiszKomorke (1,6) input else return 0
+  if eaCzyNieskonczonaPetla (1,0) input /= True then myerror $ eaWypiszKomorke (1,0) input else return 0
+  if eaCzyNieskonczonaPetla (1,1) input /= False then myerror $ eaWypiszKomorke (1,1) input else return 0
+  if eaCzyNieskonczonaPetla (1,2) input /= True then myerror $ eaWypiszKomorke (1,2) input else return 0
+  if eaCzyNieskonczonaPetla (1,3) input /= False then myerror $ eaWypiszKomorke (1,3) input else return 0
+  if eaCzyNieskonczonaPetla (1,4) input /= True then myerror $ eaWypiszKomorke (1,4) input else return 0
+  if eaCzyNieskonczonaPetla (1,5) input /= False then myerror $ eaWypiszKomorke (1,5) input else return 0
+  if eaCzyNieskonczonaPetla (1,6) input /= True then myerror $ eaWypiszKomorke (1,6) input else return 0
   print "STOP  test6"
 
 test7 = do
@@ -211,15 +213,15 @@ test7 = do
   if 
     eaArkuszPobierzIloscKolumn input /= 3 ||
     eaArkuszPobierzIloscWierszy input /= 2
-    then error "test7.1" else return 0
+    then myerror "test7.1" else return 0
   if 
     eaArkuszWstawKolumne 1 input /= outputkolumna1 ||
     eaArkuszUsunKolumne  2 input /= outputkolunabez2
-    then error "test7.2" else return 0
+    then myerror "test7.2" else return 0
   if 
     eaArkuszWstawWiersz 2 input /= outputwiersz2 ||
     eaArkuszUsunWiersz  0 input /= outputwierszbez0
-    then error "test7.3" else return 0
+    then myerror "test7.3" else return 0
   print "STOP  test7"
 
 test8 = do
@@ -231,7 +233,7 @@ test8 = do
   if 
     arkusz /= [[Liczba 1]] ||
     result /= [[Liczba 1]]
-    then error "test8" else return 0
+    then myerror "test8" else return 0
   print "STOP  test8"
 
 test9 = do
@@ -241,7 +243,7 @@ test9 = do
   if 
     eaWstawWartosc (Liczba 1) (1,2) [[Pusta,Pusta],[Pusta,Pusta]] /= [[Pusta],[Pusta],[Pusta,Liczba 1]] ||
     eaWstawWartosc (Liczba 1) (1,2) [[Pusta,Pusta],[Pusta,Pusta],[Pusta,Pusta],[Pusta,Pusta]] /= [[Pusta],[Pusta],[Pusta,Liczba 1]]
-    then error "test9" else return 0
+    then myerror "test9" else return 0
   print "STOP  test9"
 
 test10 = do
@@ -263,7 +265,7 @@ test10 = do
         [Liczba 5.0,Liczba 30.8]
         ]
   if eaArkuszaObliczWartoscWszystkichKomorek input1 /= output1
-    then error "test10.1" else return 0
+    then myerror "test10.1" else return 0
   let input2 = [
         [Liczba 0, Suma (Komorka (1,0) Pusty)], -- True , smaa na siebie
         [Liczba 1, Suma (Komorka (0,1) Pusty)], -- False
@@ -285,7 +287,7 @@ test10 = do
         [Just (Liczba 6.0),Nothing]
         ]
   if eaArkuszaObliczWartoscWszystkichKomorekMaybe input2 /= output2
-    then error "test10.2" else return 0
+    then myerror "test10.2" else return 0
   print "STOP  test10"
   
 test11 = do
@@ -304,13 +306,19 @@ test11 = do
   print $ eaCzyObliczalna (1,3) input
   print $ eaCzyObliczalna (1,4) input
   print $ eaCzyObliczalna (1,5) input-}
-  if eaCzyObliczalna (1,0) input /= True then error $ eaWypiszKomorke (1,0) input else return 0
-  if eaCzyObliczalna (1,1) input /= False then error $ eaWypiszKomorke (1,1) input else return 0
-  if eaCzyObliczalna (1,2) input /= False then error $ eaWypiszKomorke (1,2) input else return 0
-  if eaCzyObliczalna (1,3) input /= True then error $ eaWypiszKomorke (1,3) input else return 0
-  if eaCzyObliczalna (1,4) input /= False then error $ eaWypiszKomorke (1,4) input else return 0
-  if eaCzyObliczalna (1,5) input /= True then error $ eaWypiszKomorke (1,5) input else return 0
+  if eaCzyObliczalna (1,0) input /= True then myerror $ eaWypiszKomorke (1,0) input else return 0
+  if eaCzyObliczalna (1,1) input /= False then myerror $ eaWypiszKomorke (1,1) input else return 0
+  if eaCzyObliczalna (1,2) input /= False then myerror $ eaWypiszKomorke (1,2) input else return 0
+  if eaCzyObliczalna (1,3) input /= True then myerror $ eaWypiszKomorke (1,3) input else return 0
+  if eaCzyObliczalna (1,4) input /= False then myerror $ eaWypiszKomorke (1,4) input else return 0
+  if eaCzyObliczalna (1,5) input /= True then myerror $ eaWypiszKomorke (1,5) input else return 0
   print "STOP  test11"
+
+test12 = do
+  print "START test12 - wstawianie + autoresize + autominimalizacja"
+  if eaWstawWartosc (Liczba 1) (10,10) [[Pusta]] /= [[Pusta],[Pusta],[Pusta],[Pusta],[Pusta],[Pusta],[Pusta],[Pusta],[Pusta],[Pusta],[Pusta,Pusta,Pusta,Pusta,Pusta,Pusta,Pusta,Pusta,Pusta,Pusta,Liczba 1.0]]
+    then myerror "test10.2" else return 0
+  print "START test12"
 
 main = do
   test1
@@ -325,4 +333,5 @@ main = do
   test9
   test10
   test11
+  test12
 

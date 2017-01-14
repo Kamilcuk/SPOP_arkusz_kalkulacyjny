@@ -1,6 +1,7 @@
 module EdycjaArkuszaInternal where
 import EdycjaArkuszaDatatypes
 import Debug.Trace
+import Data.Char
 
 {- ---------------------- global help funcitons ---------------------------------- -}
 
@@ -28,33 +29,21 @@ deleteLasts op xs = reverse $ deleteFirsts op $ reverse xs
 deleteFirstsExceptOne :: (a -> Bool) -> [a] -> [a]
 deleteFirstsExceptOne op [b,a]  | op b == True  = [a]
                                 | otherwise     = [b,a]
-deleteFirstsExceptOne op (b:bc) | op b == True  = deleteFirsts op bc
+deleteFirstsExceptOne op (b:bc) | op b == True  = deleteFirstsExceptOne op bc
                                 | otherwise     = b : bc
 
 deleteLastsExceptOne :: (a -> Bool) -> [a] -> [a]
 deleteLastsExceptOne op xs = reverse $ deleteFirstsExceptOne op $ reverse xs
-
 
 replaceNth :: Show a => Int -> a -> [a] -> [a]
 replaceNth 0 newVal (x:xs) = newVal : xs
 replaceNth n newVal (x:xs) = x : replaceNth (n-1) newVal xs
 
 replaceXY :: Show a => (Int,Int) -> a -> [[a]] -> [[a]]
-replaceXY (0,a) newVal (x:xs) = replaceNth a newVal x : xs
-replaceXY (b,a) newVal (x:xs) = x : replaceXY ((a-1), b) newVal xs
+replaceXY (a,0) newVal (x:xs) = replaceNth a newVal x : xs
+replaceXY (a,b) newVal (x:xs) = x : replaceXY (a, (b-1)) newVal xs
 
 ------------------------- internal functions --------------------------------------
-
-eaResize :: (Int, Int) -> Arkusz -> Arkusz
-eaResize = resizeXY [Pusta]
-
--- Zmienia kazdy wiersz postaci: [Pusta, Pusta, ...] na [Pusta]
-eaArkuszMinimalizujWiersze :: Arkusz -> Arkusz
-eaArkuszMinimalizujWiersze ark = filter (not . null) $ map ( deleteLastsExceptOne (Pusta ==) ) ark
-
--- Usuwa wszystkie pusteWiersz [Pusta] na koncu arkusza
-eaArkuszMinimalizujKolumny :: Arkusz -> Arkusz
-eaArkuszMinimalizujKolumny ark = deleteLastsExceptOne ([Pusta] ==) ark
 
 eaPobierzKomorkeUnsafe :: (Int, Int) -> Arkusz -> Komorka
 eaPobierzKomorkeUnsafe (x,y) ark = ark !! y !! x

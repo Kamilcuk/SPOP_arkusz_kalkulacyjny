@@ -16,6 +16,18 @@ import Data.Maybe
 
 ------------------------------------- operacje zmieniajace arkusz ----------------------
 
+eaResize :: (Int, Int) -> Arkusz -> Arkusz
+eaResize = resizeXY [Pusta]
+
+-- Zmienia kazdy wiersz postaci: [Pusta, Pusta, ...] na [Pusta]
+eaArkuszMinimalizujWiersze :: Arkusz -> Arkusz
+eaArkuszMinimalizujWiersze ark = map ( deleteLastsExceptOne (Pusta ==) ) ark
+
+-- Usuwa wszystkie pusteWiersz [Pusta] na koncu arkusza
+eaArkuszMinimalizujKolumny :: Arkusz -> Arkusz
+eaArkuszMinimalizujKolumny ark = deleteLastsExceptOne ([Pusta] ==) ark
+
+
 eaWstawWartoscBezMinimalizacji :: Komorka -> (Int, Int) -> Arkusz  -> Arkusz 
 eaWstawWartoscBezMinimalizacji str (x,y) ark = replaceXY (x,y) str $ eaResize ( (x+1), (y+1) ) ark
 
