@@ -1,3 +1,4 @@
+import EdycjaArkusza
 import System.IO
 import System.Exit
 import System.Directory
@@ -43,8 +44,11 @@ menu = do
       temp <- getLine
       let name = temp ++ ".hexcel"
       -- otwarcie edycja arkusza
-      let arkusz = "" -- tutaj bedzie funkcja do otwierania arkusza
-      edycjaArkuszaMenu arkusz name
+      print name
+      arkusz <- eaArkuszZPliku name -- tutaj bedzie funkcja do otwierania arkusza
+      print arkusz
+      arkusz2 <- edycjaArkuszaMenu name arkusz
+      print arkusz2
       return 0
     'u' -> do
       putStrLn "> Usuwanie arkusza"
@@ -71,6 +75,7 @@ menu = do
   else
     return 0
 
+edycjaArkuszaMenu :: String -> Arkusz -> IO (Arkusz)
 edycjaArkuszaMenu nazwa arkusz = do
   putStrLn ""
   putStrLn ("> menu arkusza " ++ nazwa)
@@ -83,6 +88,7 @@ edycjaArkuszaMenu nazwa arkusz = do
   let w = if length a > 0 then (a !! 0) else ' '
   case w of
     'w' -> do
+      print arkusz
       return 0
     'e' -> do
       putStrLn "Wiersz: "
@@ -101,4 +107,4 @@ edycjaArkuszaMenu nazwa arkusz = do
   if w /= 'x' then 
     edycjaArkuszaMenu nazwa arkusz
   else
-    return 0
+    return arkusz

@@ -33,7 +33,7 @@ test2 = do
     print "STOP test2"
 
 test25 = do
-  print "START test25 - test minimalizacji wielkosći arkusza"
+  print "START test25 - test minimalizacji wielkosći arkusza - prosta"
   let input = [
         [Liczba 0, Suma (Komorka (1,0) Pusty), Pusta],
         [Liczba 1, Suma (Komorka (0,1) Pusty), Pusta],
@@ -223,12 +223,94 @@ test7 = do
   print "STOP  test7"
 
 test8 = do
+  print "START test8 - sprawdzanie wczytywania i zapisywania do pliku"
   let arkusz = [[Liczba 1]]
   let nazwaPliku = "test8.hexcel"
   eaArkuszDoPliku nazwaPliku arkusz   -- jak zapisujemy, musimy byc wewnatrz do block
   result <- eaArkuszZPliku nazwaPliku -- JAK WCZYTUJEMY TRZEBA ZROBIC '<-' wewnatrzn do block
-  print arkusz -- = [[Liczba 1]]
-  print result -- = [[Liczba 1]]
+  if 
+    arkusz /= [[Liczba 1]] ||
+    result /= [[Liczba 1]]
+    then error "test8" else return 0
+  print "STOP  test8"
+
+test9 = do
+  print "START test9 - sprawdzenie wstawiania wartości" 
+  -- podczas minimalizacji arkusza nalezy zostawić wiersze zawierające minimum jedna kolumne pusta, jeśli nie są ostatnimi
+  -- zatem minimalizacja arkusza [[Pusta,Pusta],[Pusta,Liczba 1],[Pusta,Pusta]] powinna dac: [[Pusta],[Pusta,Liczba 1]]
+  if 
+    eaWstawWartosc (Liczba 1) (1,2) [[Pusta,Pusta],[Pusta,Pusta]] /= [[Pusta],[Pusta],[Pusta,Liczba 1]] ||
+    eaWstawWartosc (Liczba 1) (1,2) [[Pusta,Pusta],[Pusta,Pusta],[Pusta,Pusta],[Pusta,Pusta]] /= [[Pusta],[Pusta],[Pusta,Liczba 1]]
+    then error "test9" else return 0
+  print "STOP  test9"
+
+test10 = do
+  print "START test10 - obliczanie wartosci calego arkusza"
+  let input1 = [
+        [Liczba 1, Napis "abs"],
+        [Liczba 2, Suma (Zakres (0,0,0,2) Pusty) ],
+        [Liczba 3, Iloczyn (Zakres (0,0,0,3) (Komorka (1,1) Pusty)) ],
+        [Liczba 4, Srednia (Zakres (0,0,0,3) Pusty) ],
+        [Liczba 4, Srednia (Zakres (0,0,0,3) (Komorka (1,2) Pusty)) ],
+        [Liczba 5, Srednia (Komorka (1,2) (Zakres (0,0,0,3) Pusty)) ]
+        ]
+  let output1 = [
+        [Liczba 1.0,Napis "abs"],
+        [Liczba 2.0,Liczba 6.0],
+        [Liczba 3.0,Liczba 144.0],
+        [Liczba 4.0,Liczba 2.5],
+        [Liczba 4.0,Liczba 30.8],
+        [Liczba 5.0,Liczba 30.8]
+        ]
+  if eaArkuszaObliczWartoscWszystkichKomorek input1 /= output1
+    then error "test10.1" else return 0
+  let input2 = [
+        [Liczba 0, Suma (Komorka (1,0) Pusty)], -- True , smaa na siebie
+        [Liczba 1, Suma (Komorka (0,1) Pusty)], -- False
+        [Liczba 2, Suma (Zakres (0,2,1,2) Pusty) ], -- True , pokrywa sie zakresem
+        [Liczba 3, Suma (Zakres (0,0,0,4) (Komorka (1,1) Pusty)) ], -- False
+        [Liczba 4, Suma (Zakres (0,0,1,0) Pusty) ], -- True - zakres wskazuje na komorke ktora sie pokrywa
+        -- False, przedzial wskazuje na komorke ktora wskazuje na zakres
+        [Liczba 5, Suma (Zakres (0,3,1,3) (Komorka (1,3) Pusty)) ],
+        -- True przedzil wskazje na zakres ktora wsakzuje na zakres który pokrywa się z samm sobą
+        [Liczba 6, Suma (Zakres (0,2,1,2) Pusty) ]
+        ]
+  let output2 = [
+        [Just (Liczba 0.0),Nothing],
+        [Just (Liczba 1.0),Just (Liczba 1.0)],
+        [Just (Liczba 2.0),Nothing],
+        [Just (Liczba 3.0),Just (Liczba 11.0)],
+        [Just (Liczba 4.0),Nothing],
+        [Just (Liczba 5.0),Just (Liczba 25.0)],
+        [Just (Liczba 6.0),Nothing]
+        ]
+  if eaArkuszaObliczWartoscWszystkichKomorekMaybe input2 /= output2
+    then error "test10.2" else return 0
+  print "STOP  test10"
+  
+test11 = do
+  print "START test11 - wykrywanie czy formuła jest obliczalna"
+  let input = [
+        [Liczba (-1), Liczba 0], -- True, liczba jest obliczalna
+        [Liczba 0, Napis "123"], -- false, napis nie jest obliczalny
+        [Liczba 1, Suma (Komorka (1,1) Pusty)], -- False, bo oblicza z napisu
+        [Liczba 2, Pusta], -- Pusta komorka jest obliczalna i jej wartosc wynosi 0
+        [Liczba 3, Suma (Zakres (0,0,100,100) Pusty)] -- False
+        -- nieistniejace komorki sa obliczalne, bo sa puste
+        ]
+  {-print $ eaCzyObliczalna (1,0) input
+  print $ eaCzyObliczalna (1,1) input
+  print $ eaCzyObliczalna (1,2) input
+  print $ eaCzyObliczalna (1,3) input
+  print $ eaCzyObliczalna (1,4) input
+  print $ eaCzyObliczalna (1,5) input-}
+  if eaCzyObliczalna (1,0) input /= True then error $ eaWypiszKomorke (1,0) input else return 0
+  if eaCzyObliczalna (1,1) input /= False then error $ eaWypiszKomorke (1,1) input else return 0
+  if eaCzyObliczalna (1,2) input /= False then error $ eaWypiszKomorke (1,2) input else return 0
+  if eaCzyObliczalna (1,3) input /= True then error $ eaWypiszKomorke (1,3) input else return 0
+  if eaCzyObliczalna (1,4) input /= False then error $ eaWypiszKomorke (1,4) input else return 0
+  if eaCzyObliczalna (1,5) input /= True then error $ eaWypiszKomorke (1,5) input else return 0
+  print "STOP  test11"
 
 main = do
   test1
@@ -240,3 +322,7 @@ main = do
   test6
   test7
   test8
+  test9
+  test10
+  test11
+
