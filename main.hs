@@ -162,6 +162,7 @@ edycjaArkuszaMenu nazwa arkusz = do
     'c' -> do
       putStrLn "Dodanie kolumny"
       putStrLn "Gdzie chciałbyś/chciałabyś dodać kolumne (po ktorej z istniejacych wstawic nowa)"
+      print "Podanie wartosci wiekszej od istniejacej wielkości arkusza spowoduje dodanie jednej kolumny na końcu arkusza."
       num <- getLine
       let num1 = readMaybe num :: Maybe Integer
       ark <- if num1 == Nothing then do
@@ -173,18 +174,25 @@ edycjaArkuszaMenu nazwa arkusz = do
       return ark
     'u' -> do
       putStrLn "Usuniecie kolumny"
-      putStrLn "Którą kolumnę usunąć? (pamietaj numeracja od zera)"
-      num <- getLine
-      let num1 = readMaybe num :: Maybe Integer     
-      ark <- if num1 == Nothing then do
-        print "Podano niepoprawno wartość kolumny."
-        return arkusz
+      ark <- if eaArkuszPobierzIloscWierszy arkusz > 1 then do
+        putStrLn "Którą kolumnę usunąć? (pamietaj numeracja od zera)"
+        print "Podanie wartości wiekszej od ilości kolumn w arkuszu nic nie zrobi"
+        num <- getLine
+        let num1 = readMaybe num :: Maybe Integer     
+        ark <- if num1 == Nothing then do
+          print "Podano niepoprawno wartość kolumny."
+          return arkusz
+        else do
+          return $ eaArkuszUsunKolumne (fromIntegral $ fromJust num1) arkusz
+        return ark
       else do
-        return $ eaArkuszUsunKolumne (fromIntegral $ fromJust num1) arkusz
+        print "Arkusz ma tylko jedną kolumnę - nie można usunąć ostatniego wiersza."
+        return arkusz
       return ark
     'a' -> do
       putStrLn "Dodanie wiersza"
       putStrLn "Gdzie chciałbyś/chciałabyś dodać wiersz (po ktorym z istniejacych wstawic nowy)"
+      print "Podanie wartosci wiekszej od istniejacej wielkości arkusza spowoduje dodanie jednego wiersza na końcu arkusza."
       num <- getLine
       let num1 = readMaybe num :: Maybe Integer     
       ark <- if num1 == Nothing then do
@@ -195,14 +203,20 @@ edycjaArkuszaMenu nazwa arkusz = do
       return ark
     'd' -> do
       putStrLn "Usuniecie wiersza"
-      putStrLn "Który wiersz usunąć? (pamietaj numeracja od zera)"
-      num <-getLine
-      let num1 = readMaybe num :: Maybe Integer
-      ark <- if num1 == Nothing then do
-        print "Podano niepoprawno wartość kolumny."
-        return arkusz
+      ark <- if eaArkuszPobierzIloscWierszy arkusz > 1 then do
+        putStrLn "Który wiersz usunąć? (pamietaj numeracja od zera)"
+        print "Podanie wartości wiekszej od ilości wierszy w arkuszu nic nie zrobi"
+        num <-getLine
+        let num1 = readMaybe num :: Maybe Integer
+        ark <- if num1 == Nothing then do
+          print "Podano niepoprawno wartość kolumny."
+          return arkusz
+        else do
+          return $ eaArkuszUsunWiersz (fromIntegral $ fromJust num1) arkusz  
+        return ark
       else do
-        return $ eaArkuszUsunWiersz (fromIntegral $ fromJust num1) arkusz  
+        print "Arkusz ma tylko jeden wiersz - nie można usunąć ostatniego wiersza."
+        return arkusz
       return ark
     'x' -> do
       return arkusz

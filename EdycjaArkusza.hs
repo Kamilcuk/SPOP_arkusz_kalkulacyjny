@@ -210,14 +210,20 @@ eaArkuszWstawWiersz x ark =
 
 eaArkuszUsunKolumne :: Int -> Arkusz -> Arkusz
 eaArkuszUsunKolumne x ark = 
-  map (uncurry (++)) $ zip
-    ( map (take (x)) ark )
-    ( map (drop (x+1)  ) ark )
+  if eaArkuszPobierzIloscKolumn ark > 1 then
+    map (uncurry (++)) $ zip
+      ( map (take (x)) ark )
+      ( map (drop (x+1)  ) ark )
+  else
+    ark
 
 eaArkuszUsunWiersz :: Int -> Arkusz -> Arkusz
 eaArkuszUsunWiersz x ark = 
-  ( take (x) ark ) ++ 
-  ( drop (x+1) ark )
+  if eaArkuszPobierzIloscWierszy ark > 1 then
+    ( take (x) ark ) ++ 
+    ( drop (x+1) ark )
+  else
+    ark
 
 -------------------- eaPobierz*  zamienia współrzędne i arkusz na coś innego ----------------------
 
