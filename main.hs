@@ -4,6 +4,8 @@ import System.Directory
 import Data.List
 import Text.Printf
 import EdycjaArkusza
+import Data.Maybe
+import Text.Read
 
 
 version :: Float
@@ -76,7 +78,8 @@ edycjaArkuszaMenu nazwa arkusz = do
   putStrLn ""
   putStrLn ("> menu arkusza " ++ nazwa)
   putStrLn "Wybierz jedną z poniższych opcji:"
-  putStrLn "w - wypisz arkusz na ekran"
+  putStrLn "w - wypisz obliczony arkusz na ekran"
+  putStrLn "W - wypisz arkusz na ekran w postaci nieobliczonej"
   putStrLn "e - edytuj dane w podanej komórce"
   putStrLn "c - dodanie kolumny"
   putStrLn "u - usuniecie kolumny"
@@ -91,18 +94,33 @@ edycjaArkuszaMenu nazwa arkusz = do
       --let name = nazwa
       --arkusz <- eaArkuszZPliku name
       --let ark = eaArkuszaObliczWartoscWszystkichKomorek  $ [[Liczba 1, Napis "abs"], [Liczba 2, Suma (Zakres (0,0,0,2) Pusty) ]]
-      let ark =eaArkuszaObliczWartoscWszystkichKomorek arkusz 
-      print ark
+      let ark1 = eaArkuszaObliczWartoscWszystkichKomorekMaybe arkusz 
+      if not $ eaCzyMoznaMaybeArkuszToArkusz ark1 then do
+        print "Arkusz jest niepoprawny - niemożliwe jest pełne obliczenie wszystkich komórek arkusza."
+        print "Wyswietlam arkusz w postaci nieobliczonej"
+        print arkusz
+        return 0
+      else do
+        let ark3 = eaMaybeArkuszToArkusz ark1
+        print ark3
+        return 0
+      return arkusz
+    'W' -> do
+      print arkusz
       return arkusz
     'e' -> do
+
+      -- pobieranie wartości
       putStrLn "Którą komórkę edytować? Numerowanie zaczynamy od (0, 0)"
+
       putStrLn "Wiersz: "
       wiersz <- getLine
+      let y1 = readMaybe wiersz :: Maybe Integer
+
       putStrLn "Kolumna: "
       kolumna <- getLine
-      -- Zmiana String na Integer
-      let x = read kolumna :: Integer
-      let y = read wiersz  :: Integer
+      let x1 = readMaybe kolumna :: Maybe Integer
+
       -- Mozliwa edycja komorki to wstawienie : Liczby, Napisu, Sumy, Iloczynu lub Sredniej
       putStrLn "Wartosc do wstawienia: "
       putStrLn "Aby wstawic liczbe poprzedz ja slowem : Liczba , na przyklad: Liczba 5"
@@ -111,18 +129,32 @@ edycjaArkuszaMenu nazwa arkusz = do
       putStrLn "Aby obliczyc iloczyn z danego zakresu : Iloczyn , na przyklad: Iloczyn (Zakres (0,0,0,3) (Komorka (1,1) Pusty))"      
       putStrLn "Aby obliczyc srednia : Srednia , na przyklad: Srednia (Komorka (1,2) (Zakres (0,0,0,3) Pusty)) "
       wart <- getLine
-      let var1 = read wart :: Komorka
-      --wywolanie funkcji 
-      let arkusz2 = eaWstawWartosc var1 (fromIntegral x,fromIntegral y) arkusz
-      arkusz3  <- if (eaCzyObliczalna (fromIntegral x,fromIntegral y) arkusz2 ) == False then
-        do putStrLn "komenda zle wprowadzona, sprobuj ponownie"
-           let ark = eaWstawWartosc Pusta (fromIntegral x,fromIntegral y) arkusz2
-           return ark
-      else 
-        do let ark = eaWstawWartosc var1 (fromIntegral x,fromIntegral y) arkusz2
-           putStrLn "Wartosc wpisana"
-           return ark
-      return arkusz3
+      let var1 = readMaybe wart :: Maybe Komorka
+
+      -- sprawdzanie błędów
+      arkusz5 <- if x1 == Nothing then do
+        print "Podana zostala niepoprawna wartosc kolumny."
+        return arkusz
+      else if y1 == Nothing then do
+        print "Podana zostala niepoprawna wartosc wiersza."
+        return arkusz
+      else if var1 == Nothing then do
+        print "Podana zostala niepoprawna wartosc komorki."
+        return arkusz
+      else do
+        let var2 = fromJust var1
+        let x2 = fromIntegral $ fromJust x1
+        let y2 = fromIntegral $ fromJust y1
+        let arkusz2 = eaWstawWartosc var2 (x2,y2) arkusz
+        arkusz3 <- if (eaCzyObliczalna (x2, y2) arkusz2 ) == False then do 
+            print "Podana formuła jest niepoprawna."
+            return arkusz2
+        else do 
+            let ark = eaWstawWartosc var2 (x2, y2) arkusz2
+            putStrLn "Wartosc zostala poprawnie wpisana do arkusza"
+            return ark
+        return arkusz3
+      return arkusz5
     's' -> do
       putStrLn "Zapisywanie arkusza"
       eaArkuszDoPliku nazwa arkusz
@@ -131,29 +163,46 @@ edycjaArkuszaMenu nazwa arkusz = do
       putStrLn "Dodanie kolumny"
       putStrLn "Gdzie chciałbyś/chciałabyś dodać kolumne (po ktorej z istniejacych wstawic nowa)"
       num <- getLine
-      let num1 = read num::Integer
-      let ark = eaArkuszWstawKolumne (fromIntegral num1) arkusz
+      let num1 = readMaybe num :: Maybe Integer
+      ark <- if num1 == Nothing then do
+        print "Podano niepoprawno wartość kolumny."
+        return arkusz
+      else do
+        let ark = eaArkuszWstawKolumne (fromIntegral $ fromJust num1) arkusz
+        return ark
       return ark
     'u' -> do
       putStrLn "Usuniecie kolumny"
       putStrLn "Którą kolumnę usunąć? (pamietaj numeracja od zera)"
       num <- getLine
-      let num1 = read num::Integer
-      let ark = eaArkuszUsunKolumne (fromIntegral num1) arkusz
+      let num1 = readMaybe num :: Maybe Integer     
+      ark <- if num1 == Nothing then do
+        print "Podano niepoprawno wartość kolumny."
+        return arkusz
+      else do
+        return $ eaArkuszUsunKolumne (fromIntegral $ fromJust num1) arkusz
       return ark
     'a' -> do
       putStrLn "Dodanie wiersza"
       putStrLn "Gdzie chciałbyś/chciałabyś dodać wiersz (po ktorym z istniejacych wstawic nowy)"
       num <- getLine
-      let num1 = read num::Integer
-      let ark = eaArkuszWstawWiersz (fromIntegral num1) arkusz  
+      let num1 = readMaybe num :: Maybe Integer     
+      ark <- if num1 == Nothing then do
+        print "Podano niepoprawno wartość kolumny."
+        return arkusz
+      else do
+        return $ eaArkuszWstawWiersz (fromIntegral $ fromJust num1) arkusz  
       return ark
     'd' -> do
       putStrLn "Usuniecie wiersza"
       putStrLn "Który wiersz usunąć? (pamietaj numeracja od zera)"
       num <-getLine
-      let num1 = read num::Integer
-      let ark = eaArkuszUsunWiersz (fromIntegral num1) arkusz  
+      let num1 = readMaybe num :: Maybe Integer
+      ark <- if num1 == Nothing then do
+        print "Podano niepoprawno wartość kolumny."
+        return arkusz
+      else do
+        return $ eaArkuszUsunWiersz (fromIntegral $ fromJust num1) arkusz  
       return ark
     'x' -> do
       return arkusz
