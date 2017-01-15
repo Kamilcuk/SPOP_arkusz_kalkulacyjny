@@ -96,8 +96,8 @@ edycjaArkuszaMenu nazwa arkusz = do
       --let ark = eaArkuszaObliczWartoscWszystkichKomorek  $ [[Liczba 1, Napis "abs"], [Liczba 2, Suma (Zakres (0,0,0,2) Pusty) ]]
       let ark1 = eaArkuszaObliczWartoscWszystkichKomorekMaybe arkusz 
       if not $ eaCzyMoznaMaybeArkuszToArkusz ark1 then do
-        print "Arkusz jest niepoprawny - niemożliwe jest pełne obliczenie wszystkich komórek arkusza."
-        print "Wyswietlam arkusz w postaci nieobliczonej"
+        putStrLn "Arkusz jest niepoprawny - niemożliwe jest pełne obliczenie wszystkich komórek arkusza."
+        putStrLn "Wyswietlam arkusz w postaci nieobliczonej"
         print arkusz
         return 0
       else do
@@ -133,13 +133,13 @@ edycjaArkuszaMenu nazwa arkusz = do
 
       -- sprawdzanie błędów
       arkusz5 <- if x1 == Nothing then do
-        print "Podana zostala niepoprawna wartosc kolumny."
+        putStrLn "Podana zostala niepoprawna wartosc kolumny."
         return arkusz
       else if y1 == Nothing then do
-        print "Podana zostala niepoprawna wartosc wiersza."
+        putStrLn "Podana zostala niepoprawna wartosc wiersza."
         return arkusz
       else if var1 == Nothing then do
-        print "Podana zostala niepoprawna wartosc komorki."
+        putStrLn "Podana zostala niepoprawna wartosc komorki."
         return arkusz
       else do
         let var2 = fromJust var1
@@ -147,7 +147,7 @@ edycjaArkuszaMenu nazwa arkusz = do
         let y2 = fromIntegral $ fromJust y1
         let arkusz2 = eaWstawWartosc var2 (x2,y2) arkusz
         arkusz3 <- if (eaCzyObliczalna (x2, y2) arkusz2 ) == False then do 
-            print "Podana formuła jest niepoprawna."
+            putStrLn "Podana formuła jest niepoprawna."
             return arkusz2
         else do 
             let ark = eaWstawWartosc var2 (x2, y2) arkusz2
@@ -162,11 +162,11 @@ edycjaArkuszaMenu nazwa arkusz = do
     'c' -> do
       putStrLn "Dodanie kolumny"
       putStrLn "Gdzie chciałbyś/chciałabyś dodać kolumne (po ktorej z istniejacych wstawic nowa)"
-      print "Podanie wartosci wiekszej od istniejacej wielkości arkusza spowoduje dodanie jednej kolumny na końcu arkusza."
+      putStrLn "Podanie wartosci wiekszej od istniejacej wielkości arkusza spowoduje dodanie jednej kolumny na końcu arkusza."
       num <- getLine
       let num1 = readMaybe num :: Maybe Integer
       ark <- if num1 == Nothing then do
-        print "Podano niepoprawno wartość kolumny."
+        putStrLn "Podano niepoprawno wartość kolumny."
         return arkusz
       else do
         let ark = eaArkuszWstawKolumne (fromIntegral $ fromJust num1) arkusz
@@ -176,27 +176,27 @@ edycjaArkuszaMenu nazwa arkusz = do
       putStrLn "Usuniecie kolumny"
       ark <- if eaArkuszPobierzIloscWierszy arkusz > 1 then do
         putStrLn "Którą kolumnę usunąć? (pamietaj numeracja od zera)"
-        print "Podanie wartości wiekszej od ilości kolumn w arkuszu nic nie zrobi"
+        putStrLn "Podanie wartości wiekszej od ilości kolumn w arkuszu nic nie zrobi"
         num <- getLine
         let num1 = readMaybe num :: Maybe Integer     
         ark <- if num1 == Nothing then do
-          print "Podano niepoprawno wartość kolumny."
+          putStrLn "Podano niepoprawno wartość kolumny."
           return arkusz
         else do
           return $ eaArkuszUsunKolumne (fromIntegral $ fromJust num1) arkusz
         return ark
       else do
-        print "Arkusz ma tylko jedną kolumnę - nie można usunąć ostatniego wiersza."
+        putStrLn "Arkusz ma tylko jedną kolumnę - nie można usunąć ostatniego wiersza."
         return arkusz
       return ark
     'a' -> do
       putStrLn "Dodanie wiersza"
       putStrLn "Gdzie chciałbyś/chciałabyś dodać wiersz (po ktorym z istniejacych wstawic nowy)"
-      print "Podanie wartosci wiekszej od istniejacej wielkości arkusza spowoduje dodanie jednego wiersza na końcu arkusza."
+      putStrLn "Podanie wartosci wiekszej od istniejacej wielkości arkusza spowoduje dodanie jednego wiersza na końcu arkusza."
       num <- getLine
       let num1 = readMaybe num :: Maybe Integer     
       ark <- if num1 == Nothing then do
-        print "Podano niepoprawno wartość kolumny."
+        putStrLn "Podano niepoprawno wartość kolumny."
         return arkusz
       else do
         return $ eaArkuszWstawWiersz (fromIntegral $ fromJust num1) arkusz  
@@ -205,17 +205,17 @@ edycjaArkuszaMenu nazwa arkusz = do
       putStrLn "Usuniecie wiersza"
       ark <- if eaArkuszPobierzIloscWierszy arkusz > 1 then do
         putStrLn "Który wiersz usunąć? (pamietaj numeracja od zera)"
-        print "Podanie wartości wiekszej od ilości wierszy w arkuszu nic nie zrobi"
+        putStrLn "Podanie wartości wiekszej od ilości wierszy w arkuszu nic nie zrobi"
         num <-getLine
         let num1 = readMaybe num :: Maybe Integer
         ark <- if num1 == Nothing then do
-          print "Podano niepoprawno wartość kolumny."
+          putStrLn "Podano niepoprawno wartość kolumny."
           return arkusz
         else do
           return $ eaArkuszUsunWiersz (fromIntegral $ fromJust num1) arkusz  
         return ark
       else do
-        print "Arkusz ma tylko jeden wiersz - nie można usunąć ostatniego wiersza."
+        putStrLn "Arkusz ma tylko jeden wiersz - nie można usunąć ostatniego wiersza."
         return arkusz
       return ark
     'x' -> do
