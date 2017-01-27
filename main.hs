@@ -158,7 +158,7 @@ edycjaArkuszaMenu nazwa arkusz = do
         let x2 = fromIntegral $ fromJust x1
         let y2 = fromIntegral $ fromJust y1
         let arkusz2 = eaWstawWartosc var2 (x2,y2) arkusz
-        arkusz3 <- if (eaCzyObliczalna (x2, y2) arkusz2 ) == False then do 
+        arkusz3 <- if (eaCzyPoprawna (x2, y2) arkusz2 ) == False then do 
             putStrLn "Podana formuła jest niepoprawna - nie można obliczyć jej wartości."
             putStrLn "Występuje albo pętla wieczna przy obliczaniu jej wartości"
             putStrLn " lub do obliczania wartości wykorzystywana jest komórka z napisem"

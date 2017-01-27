@@ -85,6 +85,10 @@ eaCzyKomorkaObliczalna (Liczba _) _ _ = True
 eaCzyKomorkaObliczalna (Napis _) _ _ = False
 eaCzyKomorkaObliczalna (Pusta) _ _  = True
 
+eaCzyKomorkaPoprawna :: Komorka -> Wspol -> Arkusz -> Bool
+eaCzyKomorkaPoprawna (Napis _) _ _ = True
+eaCzyKomorkaPoprawna k w a = eaCzyKomorkaObliczalna k w a
+
 ---------------------------- obliczanie wartosci komorek + wyswietlanie -------------------------------- 
 
 eaZakresDoZbioruWspol :: (Int,Int,Int,Int) -> [(Int,Int)]
@@ -306,6 +310,9 @@ eaCzyPusta w ark = eaCzyKomorkaPusta $ eaPobierzKomorke w ark
 -- przy obliczaniu nie może występować pętla wieczna
 eaCzyObliczalna :: (Int,Int) -> Arkusz -> Bool
 eaCzyObliczalna w ark = eaCzyKomorkaObliczalna (eaPobierzKomorke w ark) w ark
+
+eaCzyPoprawna:: (Int,Int) -> Arkusz -> Bool
+eaCzyPoprawna w ark = eaCzyKomorkaPoprawna (eaPobierzKomorke w ark) w ark
 
 ---------------------------- obliczanie wartosci komorek + wyswietlanie -------------------------------- 
 
