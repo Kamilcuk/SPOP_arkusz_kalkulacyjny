@@ -38,24 +38,36 @@ menu = do
       temp <- getLine
       let name = temp ++ ".hexcel"
       writeFile name "[[Pusta]]"
-      putStrLn ("> Utworzono arkusz " ++ name)
+      putStrLn ("> Utworzono pusty arkusz " ++ name)
       return 0
     'o' -> do 
       putStrLn "> Otwieranie arkusza"
       putStrLn "Nazwa arkusza:"
       temp <- getLine
       let name = temp ++ ".hexcel"
-      -- otwarcie edycja arkusza
-      arkusz1 <- eaArkuszZPliku name
-      arkusz2 <- edycjaArkuszaMenu name arkusz1
+      exists <- doesFileExist name
+      if exists then do
+        -- otwarcie edycja arkusza
+        arkusz1 <- eaArkuszZPliku name
+        arkusz2 <- edycjaArkuszaMenu name arkusz1
+        return 0
+      else do
+        putStrLn "Taki arkusz nie istnieje"
+        return 0
       return 0
     'u' -> do
       putStrLn "> Usuwanie arkusza"
       putStrLn "Nazwa arkusza:"
       temp <- getLine
       let name = temp ++ ".hexcel"
-      removeFile name
-      putStrLn ("> Arkusz " ++ name ++ "usunięty")
+      exists <- doesFileExist name
+      if exists then do
+        removeFile name
+        putStrLn ("> Arkusz " ++ name ++ "usunięty")
+        return 0
+      else do
+        putStrLn "Taki arkusz nie istnieje"
+        return 0
       return 0
     'w' -> do
       putStrLn "> Dostępne arkusze"

@@ -320,6 +320,14 @@ test12 = do
     then myerror "test10.2" else return 0
   print "START test12"
 
+test13 = do
+  print "START test13 - check pruning"
+  let arkusz = [[Liczba 1,Pusta],[Pusta,Pusta],[Pusta,Liczba 5,Pusta]]
+  print $ eaArkuszMinimalizuj arkusz
+  --if 
+  --  then myerror "test10.2" else return 0
+  print "START test13"  
+
 main = do
   test1
   test25
@@ -334,4 +342,5 @@ main = do
   test10
   test11
   test12
+  test13
 
